@@ -99,6 +99,7 @@ func main() {
 
 				_, err = conn.Write([]byte(text))
 				if err != nil {
+					log.Printf("error writing to peer %s: %v\n", peer, err)
 					if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 						return
 					}
@@ -113,6 +114,7 @@ func main() {
 				buff := make([]byte, 1024)
 				n, err := conn.Read(buff)
 				if err != nil {
+					log.Printf("error reading from peer %s: %v\n", peer, err)
 					if errors.Is(err, io.EOF) || errors.Is(err, io.ErrUnexpectedEOF) {
 						return
 					}

@@ -48,6 +48,43 @@ func Dial(cfg Config, req DialReq) (net.Conn, error) {
 		return nil, innerErr
 	}
 
+	//go func() {
+	//	for {
+	//		acceptingSocket, err := newReusableSocket(myAddress)
+	//		if err != nil {
+	//			panic(err)
+	//		}
+	//
+	//		err = unix.Listen(acceptingSocket, 1024)
+	//		if err != nil {
+	//			log.Println(err)
+	//			continue
+	//		}
+	//
+	//		nfd, _, err := unix.Accept(acceptingSocket)
+	//		if err != nil {
+	//			log.Println(err)
+	//			continue
+	//		}
+	//
+	//		peerFile := os.NewFile(uintptr(nfd), fmt.Sprintf("/dev/tcp_socket_%s_6", req.MyID))
+	//		peerConn, err := net.FileConn(peerFile)
+	//		if err != nil {
+	//			_ = syscall.Close(nfd)
+	//			log.Println("dial public:", err)
+	//			continue
+	//		}
+	//
+	//		select {
+	//		case peerConCh <- peerConn:
+	//			log.Printf("accepted new connection from peer: %s -> %s", peerConn.LocalAddr(), peerConn.RemoteAddr())
+	//			return
+	//		default:
+	//			return
+	//		}
+	//	}
+	//}()
+
 	enc := json.NewEncoder(serverConn)
 	dec := json.NewDecoder(serverConn)
 

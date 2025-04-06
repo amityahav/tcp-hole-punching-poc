@@ -1,3 +1,3 @@
 {
-  "public_server_address": "192.168.68.1:4567"
+  "public_server_address": "ec2-54-89-219-156.compute-1.amazonaws.com:4567"
 }
