@@ -7,11 +7,13 @@ import (
 	"log"
 	"net"
 	"os"
+	"sync/atomic"
 	"syscall"
 )
 
 func Dial(cfg Config, req DialReq) (net.Conn, error) {
 	peerConCh := make(chan net.Conn, 1)
+	var dialed atomic.Bool
 
 	serverConn, err := net.Dial("tcp", cfg.PublicServerAddress)
 	if err != nil {
@@ -50,6 +52,10 @@ func Dial(cfg Config, req DialReq) (net.Conn, error) {
 
 	//go func() {
 	//	for {
+	//		if dialed.Load() {
+	//			return
+	//		}
+	//
 	//		acceptingSocket, err := newReusableSocket(myAddress)
 	//		if err != nil {
 	//			panic(err)
@@ -109,6 +115,10 @@ func Dial(cfg Config, req DialReq) (net.Conn, error) {
 	// dial public endpoint
 	go func() {
 		for {
+			if dialed.Load() {
+				return
+			}
+
 			publicFd, err := newReusableSocket(myAddress)
 			if err != nil {
 				log.Println("failed creating reusable socket (PUBLIC):", err)
@@ -157,6 +167,10 @@ func Dial(cfg Config, req DialReq) (net.Conn, error) {
 	// dial private endpoint
 	go func() {
 		for {
+			if dialed.Load() {
+				return
+			}
+
 			privateFd, err := newReusableSocket(myAddress)
 			if err != nil {
 				log.Println("failed creating reusable socket (PRIVATE):", err)
@@ -203,6 +217,7 @@ func Dial(cfg Config, req DialReq) (net.Conn, error) {
 	}()
 
 	peerConn := <-peerConCh
+	dialed.Store(true)
 
 	return peerConn, nil
 }
